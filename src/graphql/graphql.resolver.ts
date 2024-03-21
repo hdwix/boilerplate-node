@@ -1,12 +1,12 @@
 import { Module } from "@nestjs/common";
 import { Query, Resolver } from "@nestjs/graphql";
-import { PingerType } from "./pinger.type";
+import { GqlService } from "./graphql.service";
 
 
-@Resolver(of => PingerType)
-export class PingerResolver {
-    @Query(returns => PingerType)
-    Pinger() {
+@Resolver(of => GqlService)
+export class GqlResolver {
+    @Query(returns => GqlService)
+    ping() {
         return {
             ping: 'pong',
 
