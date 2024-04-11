@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateHelloDto } from './dto/create-hello.dto';
-import { UpdateHelloDto } from './dto/update-hello.dto';
-import { PatchHelloDto } from './dto/patch-hello.dto';
+import { CreateHelloDto } from 'src/app/dto/create-hello.dto';
+import { PatchHelloDto } from 'src/app/dto/patch-hello.dto';
+import { UpdateHelloDto } from 'src/app/dto/update-hello.dto';
 
 @Injectable()
 export class HelloService {
-
   // 1 get Hello + Name
   getHello(name: string): string {
     return `Hello, ${name}!`;
@@ -21,15 +20,19 @@ export class HelloService {
     return `Your name is replaced from ${updateHelloDto.current_name} to ${updateHelloDto.new_name}`;
   }
 
-  // PATCH 
-  updateNameById(id: number, patchHelloDto: PatchHelloDto): { message: string, id: number } {
-    return { message: `Your name is replaced to ${patchHelloDto.new_name}`, id };
+  // PATCH
+  updateNameById(
+    id: number,
+    patchHelloDto: PatchHelloDto,
+  ): { message: string; id: number } {
+    return {
+      message: `Your name is replaced to ${patchHelloDto.new_name}`,
+      id,
+    };
   }
 
   // DELETE
   deleteDataById(id: number): { message: string } {
     return { message: 'Your data is deleted' };
   }
-  
-
 }
