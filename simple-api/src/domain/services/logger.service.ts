@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { APP_HOST } from 'src/constants';
+import { APP_HOST } from '../../constants';
 
 export class Context {
   module: string;

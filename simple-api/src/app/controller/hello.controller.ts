@@ -14,7 +14,7 @@ import { PatchHelloDto } from '../dto/patch-hello.dto';
 import { UpdateHelloDto } from '../dto/update-hello.dto';
 import { HelloService } from '../../domain/services/hello.service';
 import { LoggingInterceptor } from '../interceptors/logging.interceptor';
-import { Context, LoggerService } from 'src/domain/services/logger.service';
+import { Context, LoggerService } from '../../domain/services/logger.service';
 
 @Controller('hello')
 @UseInterceptors(new LoggingInterceptor())
