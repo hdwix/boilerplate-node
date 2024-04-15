@@ -1,4 +1,6 @@
+import { IsEmpty, IsString } from 'class-validator';
+
 export class PatchHelloDto {
-    new_name: string;
-  }
-  
+  @IsString()
+  new_name: string;
+}
