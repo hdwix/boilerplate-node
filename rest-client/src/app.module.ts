@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { GadgetService } from './modules/gadget/gadget.service';
-import { GadgetController } from './handler/get-All-gadget.controller';
+import { ApiService } from './domain/services/product.service';
+import { ProductController } from './app/controllers/product.controller';
 
 @Module({
   imports: [],
-  controllers: [GadgetController],
-  providers: [GadgetService],
+  controllers: [ProductController],
+  providers: [ApiService],
 })
 export class AppModule {}
