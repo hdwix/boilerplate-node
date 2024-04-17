@@ -1,11 +1,11 @@
-import { IsEmpty, IsNumber, IsString } from 'class-validator';
+import { IsEmpty, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateHelloDto {
+  @IsNotEmpty()
   @IsString()
-  @IsEmpty()
   name: string;
 
+  @IsNotEmpty()
   @IsNumber()
-  @IsEmpty()
   age: number;
 }
