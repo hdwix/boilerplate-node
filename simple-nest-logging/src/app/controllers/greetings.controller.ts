@@ -13,14 +13,9 @@ export class GreetingsController {
 
   @Get('/:name')
   greeting(@Param('name') name: string): GreetingDto {
-    this.loggingService.log(`greeting | Greetings, ${name}`, traceId());
+    const trace = traceId();
+    this.loggingService.log(`greeting | Greetings, ${name}`, trace);
 
-    return this.service.doGreeting(name, traceId);
+    return this.service.doGreeting(name, trace);
   }
-  // @Get('/:name')
-  // greeting(@Param('name') name: string): GreetingDTO {
-  //   console.log(traceId());
-  //   this.loggingService.log(`greeting | Greetings, ${name}`, traceId());
-  //   return this.service.doGreeting(name, traceId);
-  // }
 }
