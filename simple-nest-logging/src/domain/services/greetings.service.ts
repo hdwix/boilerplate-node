@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { GreetingDto } from 'src/app/dtos/greeting.dto';
 import { traceId } from 'src/constants';
 import { LoggingService } from 'src/infrastructure/logging/logger.service';
 
@@ -6,7 +7,7 @@ import { LoggingService } from 'src/infrastructure/logging/logger.service';
 export class GreetingsService {
   constructor(private readonly loggingService: LoggingService) {}
 
-  doGreeting(name: string, traceId: any): any {
+  doGreeting(name: string, traceId: any): GreetingDto {
     this.loggingService.log(`doGreeting | Greeting, ${name}!`, traceId());
 
     return {
