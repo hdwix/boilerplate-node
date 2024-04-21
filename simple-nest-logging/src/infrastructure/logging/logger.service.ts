@@ -9,7 +9,7 @@ export class LoggingService {
 
   constructor() {
     const dailyRotateFileTransport = new DailyRotateFile({
-      filename: `logs/TEST-PERTAMA-%DATE%.log`,
+      filename: `logs/${APP_NAME}-%DATE%.log`,
       datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
       maxSize: '20m',
