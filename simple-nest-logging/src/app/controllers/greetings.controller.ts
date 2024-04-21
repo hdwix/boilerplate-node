@@ -1,7 +1,7 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { traceId } from 'src/constants';
-import { GreetingsService } from 'src/domain/services/greetings.service';
-import { LoggingService } from 'src/infrastructure/logging/logger.service';
+import { generateTraceId } from '../../constants';
+import { GreetingsService } from '../../domain/services/greetings.service';
+import { LoggingService } from '../../infrastructure/logging/logger.service';
 import { GreetingDto } from '../dtos/greeting.dto';
 
 @Controller('/greeting')
@@ -13,9 +13,9 @@ export class GreetingsController {
 
   @Get('/:name')
   greeting(@Param('name') name: string): GreetingDto {
-    const trace = traceId();
-    this.loggingService.log(`greeting | Greetings, ${name}`, trace);
+    const traceId = generateTraceId();
+    this.loggingService.log(`greeting | Greetings, ${name}`, traceId);
 
-    return this.service.doGreeting(name, trace);
+    return this.service.doGreeting(name, traceId);
   }
 }

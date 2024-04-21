@@ -9,4 +9,4 @@ export const APP_NAME = process.env.APP_NAME || 'simple-nest-logging';
 //   process.env.DATABASE_SERVICE || 'DATABASE_SERVICE';
 export const APP_PORT = process.env.PORT || 3000;
 // export const APP_HOST = process.env.APP_HOST || '0.0.0.0';
-export const { v4: traceId } = require('uuid');
+export const { v4: generateTraceId } = require('uuid');

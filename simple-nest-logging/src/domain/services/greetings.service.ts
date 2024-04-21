@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { trace } from 'console';
-import { GreetingDto } from 'src/app/dtos/greeting.dto';
-import { LoggingService } from 'src/infrastructure/logging/logger.service';
+import { GreetingDto } from '../../app/dtos/greeting.dto';
+import { LoggingService } from '../../infrastructure/logging/logger.service';
 
 @Injectable()
 export class GreetingsService {
