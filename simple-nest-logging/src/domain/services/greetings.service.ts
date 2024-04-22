@@ -14,7 +14,7 @@ export class GreetingsService {
       data: `Greetings, ${name}`,
       meta: {
         code: 200,
-        message: 'Succes',
+        message: 'Success',
       },
     };
   }
