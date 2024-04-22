@@ -12,14 +12,14 @@ export class LoggingService {
       filename: `logs/${APP_NAME}-%DATE%.log`,
       datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
-      maxSize: '20m',
-      maxFiles: '14d',
+      maxSize: '10m',
+      maxFiles: '1d',
     });
 
     this.logger = winston.createLogger({
       level: 'info',
       format: winston.format.combine(
-        winston.format.timestamp(), // Tambahkan timestamp
+        winston.format.timestamp(),
         winston.format.printf((info) => {
           const { timestamp, message, context } = info;
           const source = context ? `| ${context}` : '';
@@ -31,6 +31,6 @@ export class LoggingService {
   }
 
   log(message: string, context?: string) {
-    this.logger.info(message, { context }); // Kirim context sebagai metadata
+    this.logger.info(message, { context });
   }
 }
