@@ -6,6 +6,7 @@ import { GreetingDto } from '../dtos/greeting.dto';
 
 @Controller('/greeting')
 export class GreetingsController {
+  currentPath = 'simple-nest-logging/src/app/controller/greetings.controller';
   constructor(
     private readonly service: GreetingsService,
     private readonly loggingService: LoggingService,
@@ -14,7 +15,9 @@ export class GreetingsController {
   @Get('/:name')
   greeting(@Param('name') name: string): GreetingDto {
     const traceId = generateTraceId();
-    this.loggingService.log(`greeting | Greetings, ${name}`, traceId);
+    this.loggingService.log(
+      `${this.currentPath} | greeting | ${traceId} | Greeting, ${name}!`,
+    );
 
     return this.service.doGreeting(name, traceId);
   }

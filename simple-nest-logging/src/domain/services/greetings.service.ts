@@ -6,9 +6,11 @@ import { LoggingService } from '../../infrastructure/logging/logger.service';
 @Injectable()
 export class GreetingsService {
   constructor(private readonly loggingService: LoggingService) {}
-
+  currentPath = 'simple-nest-logging/src/domain/services/greeting.service';
   doGreeting(name: string, traceId: any): GreetingDto {
-    this.loggingService.log(`doGreeting | Greeting, ${name}!`, traceId);
+    this.loggingService.log(
+      `${this.currentPath} | doGreeting | ${traceId} | Greeting, ${name}!`,
+    );
 
     return {
       data: `Greetings, ${name}`,

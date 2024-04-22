@@ -23,7 +23,7 @@ export class LoggingService {
         winston.format.printf((info) => {
           const { timestamp, message, context } = info;
           const source = context ? `| ${context}` : '';
-          return `${timestamp} | ${APP_NAME} ${source} | ${message}`;
+          return `${timestamp} | ${APP_NAME} | ${message} ${source}`;
         }),
       ),
       transports: [dailyRotateFileTransport],
