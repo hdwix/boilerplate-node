@@ -1,7 +1,7 @@
 import { Controller, Get } from "@nestjs/common";
-import { PingDto } from "src/app/dtos/ping-dto";
-import { Ping } from "src/domain/entities/ping.entity";
-import { PingService } from "src/domain/services/ping.service";
+import { PingDto } from "../../../app/dtos/ping-dto";
+import { Ping } from "../../../domain/entities/ping.entity";
+import { PingService } from "../../../domain/services/ping.service";
 
 @Controller()
 export class RestPingController {

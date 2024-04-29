@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { PingDto } from "src/app/dtos/ping-dto";
+import { PingDto } from "../../app/dtos/ping-dto";
 import { Ping } from "../entities/ping.entity";
-import { PingRepository } from "src/infrastructure/repository/ping.repository";
+import { PingRepository } from "../../infrastructure/repository/ping.repository";
 
 @Injectable()
 export class PingService {

@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { PingDto } from "src/app/dtos/ping-dto";
-import { USER_MODEL_PROVIDER } from "src/constants";
-import { Ping } from "src/domain/entities/ping.entity";
+import { PingDto } from "../../app/dtos/ping-dto";
+import { USER_MODEL_PROVIDER } from "../..//constants";
+import { Ping } from "../../domain/entities/ping.entity";
 import { PingModel } from "../models/ping.model";
 
 @Injectable()
