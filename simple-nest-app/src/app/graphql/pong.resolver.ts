@@ -6,7 +6,7 @@ import { PingDto } from '../dtos/ping-dto';
 export class PongResolver {
     constructor(private readonly pongService: PongService) {}
 
-    @Query(() => PingDto) // Define the return type of GraphQL query
+    @Query(() => PingDto) 
     getPong(): PingDto {
         return this.pongService.getPong();
     }

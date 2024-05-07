@@ -1,6 +1,6 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 
-@ObjectType() // Defining the MetaType as a GraphQL type first
+@ObjectType() 
 class MetaType {
     @Field(() => Int)
     code: number;
@@ -9,11 +9,11 @@ class MetaType {
     message: string;
 }
 
-@ObjectType() // This makes the class a GraphQL type
+@ObjectType() 
 export class PingDto {
-    @Field(() => String) // Specifying the return type as GraphQL string
+    @Field(() => String) 
     data: string;
 
-    @Field(() => MetaType) // Correctly refer to MetaType after its declaration
+    @Field(() => MetaType) 
     meta: MetaType;
 }
