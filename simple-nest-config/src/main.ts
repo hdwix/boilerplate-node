@@ -4,19 +4,14 @@ import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+  const port = configService.get<number>('APP_PORT') || 3000;
+  const app_name = configService.get<String>('APP_NAME');
+  
 
-  await app.listen(3000);
-
-  console.log(`APP_NAME: ${process.env.APP_NAME}`);
-  console.log(`APP_PORT: ${process.env.APP_PORT}`);
-  console.log(`DB_USERNAME: ${process.env.DB_USERNAME}`);
-  console.log(`DB_PASSWORD: ${process.env.DB_PASSWORD}`);
-  console.log(`DB_HOST: ${process.env.DB_HOST}`);
-
-  // APP_NAME = simple - nest - config;
-  // APP_PORT = 3000;
-  // DB_USERNAME = example;
-  // DB_PASSWORD = example;
-  // DB_HOST = localhost;
+  await app.listen(port);
+  console.log(`Application is running on PORT: ${port}`);
+  console.log(`Application name: ${app_name}`);
 }
+
 bootstrap();
