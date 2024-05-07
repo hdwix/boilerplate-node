@@ -1,17 +1,20 @@
 import { Module } from '@nestjs/common';
-import { RestPingController } from './app/rest/controllers/ping.controller';
-import { PingRepository } from './infrastructure/repository/ping.repository';
-import { PingService } from './domain/services/ping.service';
-import { USER_MODEL_PROVIDER } from './constants';
-import { modelProvider } from './infrastructure/models';
+import { RestController } from './app/rest/controllers/ping.controller';
+import { PongService } from './domain/services/ping.service';
+import { GrpcController } from './app/grpc/grpc.controller';
+import { GraphQLModule } from '@nestjs/graphql';
+import { PongResolver } from './app/graphql/pong.resolver';
+import { ApolloDriver } from '@nestjs/apollo';
 
 @Module({
-  imports: [],
-  controllers: [RestPingController],
-  providers: [
-    PingRepository,
-    PingService,
-    ...modelProvider
+  imports: [
+    GraphQLModule.forRoot({
+      driver: ApolloDriver,
+      autoSchemaFile: true,
+      
+    }),
   ],
+  controllers: [RestController, GrpcController],
+  providers: [PongService, PongResolver],
 })
 export class AppModule {}

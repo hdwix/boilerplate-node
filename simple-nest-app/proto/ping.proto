@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package pong;
+
+service PongService {
+  rpc GetPong(Empty) returns (PingResponse);
+}
+
+message Empty {}
+
+message PingResponse {
+  string data = 1;
+  Meta meta = 2;
+}
+
+message Meta {
+  int32 code = 1;
+  string message = 2;
+}

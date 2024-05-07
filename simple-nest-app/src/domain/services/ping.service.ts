@@ -1,13 +1,15 @@
-import { Injectable } from "@nestjs/common";
-import { PingDto } from "../../app/dtos/ping-dto";
-import { Ping } from "../entities/ping.entity";
-import { PingRepository } from "../../infrastructure/repository/ping.repository";
+import { Injectable } from '@nestjs/common';
+import { PingDto } from 'src/app/dtos/ping-dto';
 
 @Injectable()
-export class PingService {
-    constructor(private readonly repository: PingRepository) {}
-
-    ping(ping: PingDto): Ping {
-        return this.repository.ping(ping);
+export class PongService {
+    getPong(): PingDto {
+        return {
+            data: 'pong',
+            meta: {
+                code: 200,
+                message: 'Success'
+            }
+        };
     }
 }
