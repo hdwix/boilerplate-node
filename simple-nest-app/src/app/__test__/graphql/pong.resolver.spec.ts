@@ -41,4 +41,15 @@ describe('PongResolver', () => {
     });
     expect(mockPongService.getPong).toHaveBeenCalled();
   });
+
+  it('should handle the error when getPong service fails', () => {
+    // Simulate a service failure by throwing an error
+    const errorMessage = 'Service failed';
+    mockPongService.getPong.mockImplementation(() => {
+      throw new Error(errorMessage);
+    });
+
+    expect(() => resolver.getPong()).toThrow(Error(errorMessage));
+    expect(mockPongService.getPong).toHaveBeenCalled();
+  });
 });
