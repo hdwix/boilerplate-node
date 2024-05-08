@@ -10,7 +10,7 @@ export class LoggingService {
   constructor() {
     const dailyRotateFileTransport = new DailyRotateFile({
       filename: `logs/${APP_NAME}-%DATE%.log`,
-      datePattern: 'YYYY-MM-DD',
+      datePattern: 'YYYY-MM-DD-HH',
       zippedArchive: true,
       maxSize: '10m',
       maxFiles: '1d',
