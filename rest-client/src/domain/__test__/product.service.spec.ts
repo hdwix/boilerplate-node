@@ -1,12 +1,12 @@
-// api.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import axios from 'axios';
+import AxiosMockAdapter from 'axios-mock-adapter';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { ApiService } from '../services/product.service';
-
-jest.mock('axios');
 
 describe('ApiService', () => {
   let service: ApiService;
+  let axiosMock: AxiosMockAdapter;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -14,6 +14,11 @@ describe('ApiService', () => {
     }).compile();
 
     service = module.get<ApiService>(ApiService);
+    axiosMock = new AxiosMockAdapter(axios);
+  });
+
+  afterEach(() => {
+    axiosMock.reset();
   });
 
   it('should be defined', () => {
@@ -21,43 +26,45 @@ describe('ApiService', () => {
   });
 
   describe('get', () => {
-    it('should return data from GET request', async () => {
-      const responseData = { id: 1, name: 'Product 1' };
-      const mockedResponse = { data: responseData };
-      (axios.get as jest.Mock).mockResolvedValue(mockedResponse);
+    it('should return data when the GET request is successful', async () => {
+      const endpoint = 'test';
+      const mockData = { success: true };
+      axiosMock.onGet(`${service['apiUrl']}${endpoint}`).reply(200, mockData);
 
-      const result = await service.get('test');
-
-      expect(result).toEqual(responseData);
+      const result = await service.get(endpoint);
+      expect(result).toEqual(mockData);
     });
 
-    it('should handle errors', async () => {
-      const errorMessage = 'Error fetching data';
-      (axios.get as jest.Mock).mockRejectedValue(new Error(errorMessage));
+    it('should throw HttpException when the GET request fails', async () => {
+      const endpoint = 'test';
+      axiosMock.onGet(`${service['apiUrl']}${endpoint}`).networkError();
 
-      await expect(service.get('test')).rejects.toThrow(errorMessage);
+      await expect(service.get(endpoint)).rejects.toThrow(HttpException);
     });
   });
 
   describe('post', () => {
-    it('should return data from POST request', async () => {
-      const requestData = { name: 'Product 1' };
-      const responseData = { id: 1, ...requestData };
-      const mockedResponse = { data: responseData };
-      (axios.post as jest.Mock).mockResolvedValue(mockedResponse);
+    it('should return data when the POST request is successful', async () => {
+      const endpoint = 'test';
+      const postData = { key: 'value' };
+      const mockData = { success: true };
+      axiosMock
+        .onPost(`${service['apiUrl']}${endpoint}`, postData)
+        .reply(200, mockData);
 
-      const result = await service.post('test', requestData);
-
-      expect(result).toEqual(responseData);
+      const result = await service.post(endpoint, postData);
+      expect(result).toEqual(mockData);
     });
 
-    it('should handle errors', async () => {
-      const requestData = { name: 'Product 1' };
-      const errorMessage = 'Error posting data';
-      (axios.post as jest.Mock).mockRejectedValue(new Error(errorMessage));
+    it('should throw HttpException when the POST request fails', async () => {
+      const endpoint = 'test';
+      const postData = { key: 'value' };
+      axiosMock
+        .onPost(`${service['apiUrl']}${endpoint}`, postData)
+        .networkError();
 
-      await expect(service.post('test', requestData)).rejects.toThrow(
-        errorMessage,
+      await expect(service.post(endpoint, postData)).rejects.toThrow(
+        HttpException,
       );
     });
   });

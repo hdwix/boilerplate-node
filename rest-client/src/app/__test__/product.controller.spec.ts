@@ -1,7 +1,8 @@
-// product.controller.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductController } from '../controllers/product.controller';
 import { ApiService } from '../../domain/services/product.service';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import { ProductDto } from '../dto/product.dto';
 
 describe('ProductController', () => {
   let controller: ProductController;
@@ -10,7 +11,15 @@ describe('ProductController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ProductController],
-      providers: [ApiService],
+      providers: [
+        {
+          provide: ApiService,
+          useValue: {
+            get: jest.fn(),
+            post: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     controller = module.get<ProductController>(ProductController);
@@ -23,36 +32,67 @@ describe('ProductController', () => {
 
   describe('getAllProducts', () => {
     it('should return an array of products', async () => {
-      const result = [
-        { id: 1, name: 'Product 1' },
-        { id: 2, name: 'Product 2' },
+      const result: ProductDto[] = [
+        {
+          name: 'Laptop',
+          data: {
+            year: 2021,
+            price: 999,
+            CPU_model: 'Intel i7',
+            Hard_disk_size: '1TB',
+          },
+        },
       ];
+      jest.spyOn(apiService, 'get').mockResolvedValue(result);
+      expect(await controller.getAllProducts()).toBe(result);
+    });
+
+    it('should handle exceptions', async () => {
       jest
         .spyOn(apiService, 'get')
-        .mockImplementation(() => Promise.resolve(result));
-
-      expect(await controller.getAllProducts()).toBe(result);
+        .mockRejectedValue(
+          new HttpException('Not Found', HttpStatus.NOT_FOUND),
+        );
+      await expect(controller.getAllProducts()).rejects.toThrow(HttpException);
     });
   });
 
   describe('createProduct', () => {
     it('should return the created product', async () => {
-      const productDto = {
-        name: 'Apple MacBook Pro 16',
+      const productDto: ProductDto = {
+        name: 'Desktop',
         data: {
-          year: 2019,
-          price: 1849.99,
-          CPU_model: 'Intel Core i9',
-          Hard_disk_size: '1 TB',
+          year: 2022,
+          price: 1500,
+          CPU_model: 'AMD Ryzen 7',
+          Hard_disk_size: '2TB',
         },
       };
+      jest.spyOn(apiService, 'post').mockResolvedValue(productDto);
+      expect(await controller.createProduct(productDto)).toEqual(productDto);
+    });
 
-      const createdProduct = { id: 1, ...productDto };
+    it('should handle exceptions on creation', async () => {
+      const productDto: ProductDto = {
+        name: 'Desktop',
+        data: {
+          year: 2022,
+          price: 1500,
+          CPU_model: 'AMD Ryzen 7',
+          Hard_disk_size: '2TB',
+        },
+      };
       jest
         .spyOn(apiService, 'post')
-        .mockImplementation(() => Promise.resolve(createdProduct));
-
-      expect(await controller.createProduct(productDto)).toBe(createdProduct);
+        .mockRejectedValue(
+          new HttpException(
+            'Internal Server Error',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          ),
+        );
+      await expect(controller.createProduct(productDto)).rejects.toThrow(
+        HttpException,
+      );
     });
   });
 });

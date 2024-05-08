@@ -1,5 +1,12 @@
 // product.controller.ts
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { ApiService } from '../../domain/services/product.service';
 import { ProductDto } from '../dto/product.dto';
 
@@ -8,12 +15,13 @@ export class ProductController {
   constructor(private readonly apiService: ApiService) {}
 
   @Get()
-  async getAllProducts(): Promise<any> {
+  async getAllProducts(): Promise<ProductDto[]> {
     return await this.apiService.get('objects');
   }
 
   @Post()
-  async createProduct(@Body() productDto: ProductDto): Promise<any> {
+  @HttpCode(HttpStatus.CREATED)
+  async createProduct(@Body() productDto: ProductDto): Promise<ProductDto> {
     return await this.apiService.post('objects', productDto);
   }
 }
