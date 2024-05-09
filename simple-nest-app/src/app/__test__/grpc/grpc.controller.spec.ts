@@ -46,4 +46,27 @@ describe('GrpcController', () => {
     });
     expect(mockPongService.getPong).toHaveBeenCalled();
   });
+
+  it('should handle error response from PongService', () => {
+    mockPongService.getPong.mockReturnValue({
+      data: null,
+      meta: {
+        code: 500,
+        message: 'Internal server error',
+      },
+    });
+
+    const result = controller.getPong({});
+    expect(result.meta.code).toBe(500);
+    expect(result.meta.message).toBe('Internal server error');
+    expect(mockPongService.getPong).toHaveBeenCalled();
+  });
+
+  it('should handle null or undefined return from PongService', () => {
+    mockPongService.getPong.mockReturnValue(null);
+
+    const result = controller.getPong({});
+    expect(result).toBeNull();
+    expect(mockPongService.getPong).toHaveBeenCalled();
+  });
 });
