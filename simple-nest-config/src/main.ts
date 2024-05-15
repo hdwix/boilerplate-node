@@ -1,17 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
+import { ConsulConfigService } from './infrastructure/consul/consul-config.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
-  const port = configService.get<number>('APP_PORT');
-  const app_name = configService.get<String>('APP_NAME');
-  
-
+  const configService = app.get(ConsulConfigService);
+  const port = (await configService.getKey('APP_PORT')) || 3000;
   await app.listen(port);
-  console.log(`Application is running on PORT: ${port}`);
-  console.log(`Application name: ${app_name}`);
 }
 
 bootstrap();
