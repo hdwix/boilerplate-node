@@ -5,6 +5,8 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "constants": "^0.0.2",
-    "dotenv": "^16.4.5"
+    "consul": "^1.2.0",
+    "dotenv": "^16.4.5",
+    "nestjs-consul-kv-realtime": "^0.1.10"
   }
 }
