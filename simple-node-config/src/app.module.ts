@@ -1,12 +1,16 @@
 import { Module } from '@nestjs/common';
-import { ConfigController } from './application/config.controller';
-import { HttpModule } from '@nestjs/axios';
-import { ConsulConfigService } from './infrastructure/consul/consul-config.service';
-import { ConfigService } from './domain/services/config.service';
+import { ConfigModule } from '@nestjs/config';
+import configuration from './common/config/configuration';
+import { ConsulConfigService } from './domain/services/consul-config.service';
 
 @Module({
-  imports: [HttpModule],
-  controllers: [ConfigController],
-  providers: [ConsulConfigService, ConfigService],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [configuration],
+    }),
+  ],
+  controllers: [],
+  providers: [ConsulConfigService],
 })
 export class AppModule {}
