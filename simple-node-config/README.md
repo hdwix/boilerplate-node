@@ -8,13 +8,10 @@ $ npm install
 
 ```bash
 # development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
+$ NODE_ENV=local npm run start
 
 # production mode
-$ npm run start:prod
+$ NODE_ENV=production npm run start
 ```
 
 ## Test
