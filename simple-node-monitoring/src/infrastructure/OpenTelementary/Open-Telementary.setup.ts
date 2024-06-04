@@ -2,7 +2,13 @@ import { NodeSDK } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import { Resource } from '@opentelemetry/resources';
-import { envDetectorSync, hostDetectorSync, processDetectorSync, DetectorSync, ResourceDetectionConfig } from '@opentelemetry/resources';
+import {
+  envDetectorSync,
+  hostDetectorSync,
+  processDetectorSync,
+  DetectorSync,
+  ResourceDetectionConfig,
+} from '@opentelemetry/resources';
 import { NestInstrumentation } from '@opentelemetry/instrumentation-nestjs-core';
 
 function awaitAttributes(detector: DetectorSync): DetectorSync {
@@ -24,6 +30,7 @@ const zipkinExporter = new ZipkinExporter({
 const sdk = new NodeSDK({
   resource: new Resource({
     'service.name': 'nestjs-monitoring-app',
+    'service.version': '1.0.0',
   }),
   traceExporter: zipkinExporter,
   instrumentations: [getNodeAutoInstrumentations(), new NestInstrumentation()],
