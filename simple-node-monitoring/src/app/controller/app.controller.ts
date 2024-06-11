@@ -7,7 +7,7 @@ import { AppService } from '../../domain/service/app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
+  @Get('/hello')
   getHello(): string {
     const tracer = trace.getTracer('default');
     const span = tracer.startSpan('AppController.getHello');

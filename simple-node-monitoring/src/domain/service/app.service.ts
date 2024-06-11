@@ -9,7 +9,6 @@ export class AppService {
     span.setAttribute('service.name', 'AppService.getHello');
     span.setAttribute('service.version', '1.0.0');
     try {
-      // Business logic here
       return 'Hello World!';
     } finally {
       span.end();

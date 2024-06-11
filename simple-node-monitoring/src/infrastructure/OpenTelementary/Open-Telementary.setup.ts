@@ -1,7 +1,7 @@
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
-import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 import { Resource } from '@opentelemetry/resources';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-grpc';
 import {
   envDetectorSync,
   hostDetectorSync,
@@ -10,6 +10,7 @@ import {
   ResourceDetectionConfig,
 } from '@opentelemetry/resources';
 import { NestInstrumentation } from '@opentelemetry/instrumentation-nestjs-core';
+import * as grpc from '@grpc/grpc-js';
 
 function awaitAttributes(detector: DetectorSync): DetectorSync {
   return {
@@ -23,16 +24,18 @@ function awaitAttributes(detector: DetectorSync): DetectorSync {
   };
 }
 
-const zipkinExporter = new ZipkinExporter({
-  url: 'http://localhost:9411/api/v2/spans',
+const otlpExporter = new OTLPTraceExporter({
+  url: 'grpc://103.127.137.201:30001',
+  // http://otel.shadrachjabonir.my.id/
+  credentials: grpc.credentials.createInsecure(), // Disable TLS
 });
 
 const sdk = new NodeSDK({
   resource: new Resource({
-    'service.name': 'nestjs-monitoring-app',
+    'service.name': 'simple-nest-monitoring',
     'service.version': '1.0.0',
   }),
-  traceExporter: zipkinExporter,
+  traceExporter: otlpExporter,
   instrumentations: [getNodeAutoInstrumentations(), new NestInstrumentation()],
   resourceDetectors: [
     awaitAttributes(envDetectorSync),
