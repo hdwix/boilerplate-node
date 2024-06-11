@@ -1,0 +1,4 @@
+APP_ENV: production
+APP_PORT: 3000
+APP_NAME: simple-nest-monitoring
+OTEL_ADDRESS: 'grpc://103.127.137.201:30001'

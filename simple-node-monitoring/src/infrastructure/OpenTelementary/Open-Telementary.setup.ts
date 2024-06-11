@@ -11,6 +11,9 @@ import {
 } from '@opentelemetry/resources';
 import { NestInstrumentation } from '@opentelemetry/instrumentation-nestjs-core';
 import * as grpc from '@grpc/grpc-js';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from 'src/app.module';
 
 function awaitAttributes(detector: DetectorSync): DetectorSync {
   return {
@@ -24,36 +27,53 @@ function awaitAttributes(detector: DetectorSync): DetectorSync {
   };
 }
 
-const otlpExporter = new OTLPTraceExporter({
-  url: 'grpc://103.127.137.201:30001',
-  // http://otel.shadrachjabonir.my.id/
-  credentials: grpc.credentials.createInsecure(), // Disable TLS
-});
+async function setupOpenTelemetry() {
+  const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+  const otelAddress = configService.get<string>('OTEL_ADDRESS');
 
-const sdk = new NodeSDK({
-  resource: new Resource({
-    'service.name': 'simple-nest-monitoring',
-    'service.version': '1.0.0',
-  }),
-  traceExporter: otlpExporter,
-  instrumentations: [getNodeAutoInstrumentations(), new NestInstrumentation()],
-  resourceDetectors: [
-    awaitAttributes(envDetectorSync),
-    awaitAttributes(processDetectorSync),
-    awaitAttributes(hostDetectorSync),
-  ],
-});
+  const otlpExporter = new OTLPTraceExporter({
+    url: otelAddress,
+    credentials: grpc.credentials.createInsecure(), // Disable TLS
+  });
 
-sdk.start();
-console.log('Tracing initialized');
+  const sdk = new NodeSDK({
+    resource: new Resource({
+      'service.name': 'simple-nest-monitoring',
+      'service.version': '1.0.0',
+    }),
+    traceExporter: otlpExporter,
+    instrumentations: [
+      getNodeAutoInstrumentations({
+        // Exclude fs instrumentation
+        '@opentelemetry/instrumentation-fs': {
+          enabled: false
+        }
+      }),
+      new NestInstrumentation()
+    ],
+    resourceDetectors: [
+      awaitAttributes(envDetectorSync),
+      awaitAttributes(processDetectorSync),
+      awaitAttributes(hostDetectorSync),
+    ],
+  });
 
-process.on('SIGTERM', async () => {
-  try {
-    await sdk.shutdown();
-    console.log('Tracing terminated');
-  } catch (error) {
-    console.log('Error terminating tracing', error);
-  } finally {
-    process.exit(0);
-  }
-});
+  sdk.start();
+  console.log('Tracing initialized');
+
+  process.on('SIGTERM', async () => {
+    try {
+      await sdk.shutdown();
+      console.log('Tracing terminated');
+    } catch (error) {
+      console.log('Error terminating tracing', error);
+    } finally {
+      process.exit(0);
+    }
+  });
+
+}
+
+setupOpenTelemetry();
+
