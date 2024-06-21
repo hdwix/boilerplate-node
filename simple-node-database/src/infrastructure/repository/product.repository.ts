@@ -39,23 +39,48 @@ export class ProductRepository {
     let savedProduct: Product;
 
     try {
-      // 1. Create the product:
       const newProduct = this.productRepository.create(productData);
-      // 2. Save the product within the transaction:
       savedProduct = await queryRunner.manager.save(newProduct);
 
-      // 3. Commit the transaction:
       await queryRunner.commitTransaction();
-      console.log('create product sukses', savedProduct);
+      console.log('create product success', savedProduct);
 
       return savedProduct;
     } catch (error) {
-      // 4. If an error occurred, rollback the transaction:
       await queryRunner.rollbackTransaction();
-      console.log('create product gagal, begin rollback', error);
-      throw error; // Re-throw the error to handle it appropriately
+      console.log('create product failed, begin rollback', error);
+      throw error;
     } finally {
-      // 5. Always release the query runner connection:
+      await queryRunner.release();
+    }
+  }
+
+  async updateTransactionally(
+    id: number,
+    productData: Partial<Product>,
+  ): Promise<void> {
+    const queryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const existingProduct = await queryRunner.manager.findOne(Product, {
+        where: { id },
+      });
+      if (!existingProduct) {
+        throw new Error(`Product with id ${id} not found`);
+      }
+
+      const updatedProduct = Object.assign(existingProduct, productData);
+      await queryRunner.manager.save(updatedProduct);
+
+      await queryRunner.commitTransaction();
+      console.log('update product success', updatedProduct);
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      console.log('update product failed, begin rollback', error);
+      throw error;
+    } finally {
       await queryRunner.release();
     }
   }
