@@ -1,14 +1,18 @@
-// Import OpenTelemetry setup as the very first import
-import './infrastructure/OpenTelementary/Open-Telementary.setup';
-// /home/yadi/Documents/Telkomsel/testing/open-telementary-monitoring/src/infrastructure/OpenTelementary/Open-Telementary.setup.ts
-
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { AppModule } from './app.module';
+import { register } from 'prom-client';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app
+    .getHttpAdapter()
+    .getInstance()
+    .get('/metrics', async (req, res) => {
+      res.set('Content-Type', register.contentType);
+      res.end(await register.metrics());
+    });
   const logger = new Logger('Bootstrap');
   const configService = app.get(ConfigService);
   const port = configService.get('APP_PORT');
