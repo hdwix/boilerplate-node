@@ -1,5 +1,6 @@
-import { HELLO_MODEL_PROVIDER } from '../../constants';
 import { HelloModel } from './hello.model';
+
+export const HELLO_MODEL_PROVIDER = 'HelloModelProvider';
 
 export const modelProviders = [
   {

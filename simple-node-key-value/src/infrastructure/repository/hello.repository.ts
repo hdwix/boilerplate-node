@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CreateHelloDto } from '../../app/dto/create-hello.dto';
-import { HELLO_MODEL_PROVIDER } from '../../constants';
 import { Hello } from '../../domain/entities/hello.entity';
 import { HelloModel } from '../model/hello.model';
+import { HELLO_MODEL_PROVIDER } from '../model';
 
 @Injectable()
 export class HelloRepository {
