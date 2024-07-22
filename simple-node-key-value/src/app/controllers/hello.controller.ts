@@ -47,7 +47,7 @@ export class HelloController {
     const message = this.helloService.sayHello(createHelloDto);
     const context: Context = { module: 'HelloController', method: 'sayHello' };
     const cacheKey = `hello:${name}`;
-    await this.redisService.set(cacheKey, message, 3600);
+    await this.redisService.set(cacheKey, JSON.stringify(createHelloDto), 3600);
     this.Log.logger('Succed', context);
     return { data: { message } };
   }

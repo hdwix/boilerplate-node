@@ -6,6 +6,10 @@ export class CreateHelloDto {
   name: string;
 
   @IsNotEmpty()
-  @IsNumber()
+  @IsString()
   age: number;
+
+  @IsString()
+  @IsNotEmpty()
+  city: string;
 }
