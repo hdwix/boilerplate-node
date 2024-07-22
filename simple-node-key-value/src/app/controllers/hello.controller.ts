@@ -23,17 +23,20 @@ export class HelloController {
   private Log: LoggerService = new LoggerService('createOperation');
   constructor(
     private readonly helloService: HelloService,
-    private readonly redisService: RedisService
+    private readonly redisService: RedisService,
   ) {}
 
   // Hello Name GET
   @Get(':name')
   async getHello(@Param('name') name: string): Promise<{ data: string }> {
     const cacheKey = `hello:${name}`;
-    let message = await this.redisService.get(cacheKey, { module: 'HelloController', method: 'getHello' });
+    let message = await this.redisService.get(cacheKey, {
+      module: 'HelloController',
+      method: 'getHello',
+    });
 
     if (!message) {
-      message = this.helloService.getHello(name); 
+      message = this.helloService.getHello(name);
       await this.redisService.set(cacheKey, message, 3600);
     }
     const context: Context = { module: 'HelloController', method: 'getHello' };
@@ -43,7 +46,9 @@ export class HelloController {
 
   // Name + Age POST
   @Post()
-  async sayHello(@Body() createHelloDto: CreateHelloDto): Promise<{ data: { message: string } }> {
+  async sayHello(
+    @Body() createHelloDto: CreateHelloDto,
+  ): Promise<{ data: { message: string } }> {
     const message = this.helloService.sayHello(createHelloDto);
     const context: Context = { module: 'HelloController', method: 'sayHello' };
     const cacheKey = `hello:${createHelloDto.name}`;
@@ -74,10 +79,12 @@ export class HelloController {
     return { data: { message, id: updatedId } };
   }
 
-  // DELETE by ID
-  @Delete(':id')
-  deleteDataById(@Param('id') id: number): { data: { message: string } } {
-    const { message } = this.helloService.deleteDataById(id);
+  // DELETE by name
+  @Delete('/delete/:name')
+  async deleteDataByName(
+    @Param('name') name: string,
+  ): Promise<{ data: { message: string } }> {
+    const { message } = await this.helloService.deleteDataByKey(name);
     return { data: { message } };
   }
 }
