@@ -15,17 +15,27 @@ import { UpdateHelloDto } from '../dto/update-hello.dto';
 import { HelloService } from '../../domain/services/hello.service';
 import { LoggingInterceptor } from '../interceptors/logging.interceptor';
 import { Context, LoggerService } from '../../domain/services/logger.service';
+import { RedisService } from '../../infrastructure/redis/redis.service';
 
 @Controller('hello')
 @UseInterceptors(new LoggingInterceptor())
 export class HelloController {
   private Log: LoggerService = new LoggerService('createOperation');
-  constructor(private readonly helloService: HelloService) {}
+  constructor(
+    private readonly helloService: HelloService,
+    private readonly redisService: RedisService
+  ) {}
 
   // Hello Name GET
   @Get(':name')
-  getHello(@Param('name') name: string): { data: string } {
-    const message = this.helloService.getHello(name);
+  async getHello(@Param('name') name: string): Promise<{ data: string }> {
+    const cacheKey = `hello:${name}`;
+    let message = await this.redisService.get(cacheKey, { module: 'HelloController', method: 'getHello' });
+
+    if (!message) {
+      message = this.helloService.getHello(name); 
+      await this.redisService.set(cacheKey, message, 3600);
+    }
     const context: Context = { module: 'HelloController', method: 'getHello' };
     this.Log.logger('Succed', context);
     return { data: message };
@@ -33,11 +43,11 @@ export class HelloController {
 
   // Name + Age POST
   @Post()
-  sayHello(@Body() createHelloDto: CreateHelloDto): {
-    data: { message: string };
-  } {
+  async sayHello(@Body() createHelloDto: CreateHelloDto): Promise<{ data: { message: string } }> {
     const message = this.helloService.sayHello(createHelloDto);
     const context: Context = { module: 'HelloController', method: 'sayHello' };
+    const cacheKey = `hello:${name}`;
+    await this.redisService.set(cacheKey, JSON.stringify(createHelloDto), 3600);
     this.Log.logger('Succed', context);
     return { data: { message } };
   }

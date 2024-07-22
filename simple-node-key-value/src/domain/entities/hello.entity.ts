@@ -8,4 +8,8 @@ export class Hello {
   @IsNumber()
   @IsNotEmpty()
   age: number;
+
+  @IsString()
+  @IsNotEmpty()
+  city: string;
 }
