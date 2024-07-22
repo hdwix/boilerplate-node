@@ -44,7 +44,8 @@ export class HelloService {
         return { message: 'Data not found' };
       }
       return { message: 'Your data is deleted' };
-    } catch (error) {}
-    return { message: 'Error deleting data' };
+    } catch (error) {
+      return { message: 'Error deleting data' };
+    }
   }
 }
