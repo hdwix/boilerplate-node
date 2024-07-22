@@ -46,7 +46,7 @@ export class HelloController {
   async sayHello(@Body() createHelloDto: CreateHelloDto): Promise<{ data: { message: string } }> {
     const message = this.helloService.sayHello(createHelloDto);
     const context: Context = { module: 'HelloController', method: 'sayHello' };
-    const cacheKey = `hello:${name}`;
+    const cacheKey = `hello:${createHelloDto.name}`;
     await this.redisService.set(cacheKey, JSON.stringify(createHelloDto), 3600);
     this.Log.logger('Succed', context);
     return { data: { message } };
