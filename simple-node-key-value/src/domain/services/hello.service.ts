@@ -21,8 +21,8 @@ export class HelloService {
   }
 
   // Update current name => new name
-  updateName(updateHelloDto: UpdateHelloDto): string {
-    return `Your name is replaced from ${updateHelloDto.current_name} to ${updateHelloDto.new_name}`;
+  updateName(current_name: string, updateHelloDto: UpdateHelloDto): string {
+    return `Your name is replaced from ${current_name} to ${updateHelloDto.new_name}`;
   }
 
   // PATCH
