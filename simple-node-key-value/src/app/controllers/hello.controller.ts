@@ -59,19 +59,27 @@ export class HelloController {
 
   //
   @Put()
-  updateName(@Body() updateHelloDto: UpdateHelloDto): {
+  async updateName(@Body() updateHelloDto: UpdateHelloDto): Promise<{
     data: { message: string };
-  } {
+  }> {
+    const cacheKey = `hello:${updateHelloDto.current_name}`;
+    const result = await this.redisService.del(cacheKey);
+    if (result === 0) {
+      return { data: { message: 'Data not found' } };
+    }
     const message = this.helloService.updateName(updateHelloDto);
+    const newCacheKey = `hello:${updateHelloDto.new_name}`;
+    const value = `Hello, ${updateHelloDto.new_name}!`;
+    await this.redisService.set(newCacheKey, value, 3600);
     return { data: { message } };
   }
 
   // PATCH
   @Patch(':id')
-  updateNameById(
+  async updateNameById(
     @Param('id') id: number,
     @Body() patchHelloDto: PatchHelloDto,
-  ): { data: { message: string; id: number } } {
+  ): Promise<{ data: { message: string; id: number } }> {
     const { message, id: updatedId } = this.helloService.updateNameById(
       id,
       patchHelloDto,

@@ -68,4 +68,27 @@ export class RedisService {
       throw error;
     }
   }
+
+  async update(
+    key: string,
+    value: string,
+    ttlSeconds?: number,
+  ): Promise<string | null> {
+    try {
+      const result = ttlSeconds
+        ? await this.redis.set(key, value, 'EX', ttlSeconds)
+        : await this.redis.set(key, value);
+      this.Log.logger(
+        `Updated key '${key}' to '${value}'${ttlSeconds ? ` (TTL: ${ttlSeconds}s)` : ''}`,
+        { module: 'RedisService', method: 'update' },
+      );
+      return result;
+    } catch (error) {
+      this.Log.error(`Error setting key '${key}': ${error}`, {
+        module: 'RedisService',
+        method: 'update',
+      });
+      throw error;
+    }
+  }
 }
