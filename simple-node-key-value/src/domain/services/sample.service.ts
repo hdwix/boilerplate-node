@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { CreateHelloDto } from '../..//app/dto/create-hello.dto';
-import { PatchHelloDto } from '../..//app/dto/patch-hello.dto';
-import { UpdateHelloDto } from '../../app/dto/update-hello.dto';
+import { CreateSampleDto } from '../../app/dto/create-sample.dto';
+import { PatchSampleDto } from '../../app/dto/patch-sample.dto';
+import { UpdateSampleDto } from '../../app/dto/update-sample.dto';
 import { LoggerService } from './logger.service';
 import { RedisService } from '../../infrastructure/redis/redis.service';
 
 @Injectable()
-export class HelloService {
-  private Log: LoggerService = new LoggerService(HelloService.name);
+export class SampleService {
+  private Log: LoggerService = new LoggerService(SampleService.name);
   constructor(private readonly redisService: RedisService) {}
 
   // 1 get Hello + Name
@@ -16,19 +16,19 @@ export class HelloService {
   }
 
   // Post Hello name + age
-  sayHello(createHelloDto: CreateHelloDto): string {
-    return `Hello, ${createHelloDto.name} you are ${createHelloDto.age} years old`;
+  sayHello(createSampleDto: CreateSampleDto): string {
+    return `Hello, ${createSampleDto.name} you are ${createSampleDto.age} years old`;
   }
 
   // Update current name => new name
-  updateName(current_name: string, updateHelloDto: UpdateHelloDto): string {
-    return `Your name is replaced from ${current_name} to ${updateHelloDto.new_name}`;
+  updateName(current_name: string, updateSampleDto: UpdateSampleDto): string {
+    return `Your name is replaced from ${current_name} to ${updateSampleDto.new_name}`;
   }
 
   // PATCH
   updateNameById(
     id: number,
-    patchHelloDto: PatchHelloDto,
+    patchHelloDto: PatchSampleDto,
   ): { message: string; id: number } {
     return {
       message: `Your name is replaced to ${patchHelloDto.new_name}`,

@@ -9,20 +9,20 @@ import {
   Put,
   UseInterceptors,
 } from '@nestjs/common';
-import { CreateHelloDto } from '../dto/create-hello.dto';
-import { PatchHelloDto } from '../dto/patch-hello.dto';
-import { UpdateHelloDto } from '../dto/update-hello.dto';
-import { HelloService } from '../../domain/services/hello.service';
+import { CreateSampleDto } from '../dto/create-sample.dto';
+import { PatchSampleDto } from '../dto/patch-sample.dto';
+import { UpdateSampleDto } from '../dto/update-sample.dto';
+import { SampleService } from '../../domain/services/sample.service';
 import { LoggingInterceptor } from '../interceptors/logging.interceptor';
 import { Context, LoggerService } from '../../domain/services/logger.service';
 import { RedisService } from '../../infrastructure/redis/redis.service';
 
-@Controller('hello')
+@Controller('samples')
 @UseInterceptors(new LoggingInterceptor())
-export class HelloController {
+export class SampleController {
   private Log: LoggerService = new LoggerService('createOperation');
   constructor(
-    private readonly helloService: HelloService,
+    private readonly sampleService: SampleService,
     private readonly redisService: RedisService,
   ) {}
 
@@ -36,7 +36,7 @@ export class HelloController {
     });
 
     if (!message) {
-      message = this.helloService.getHello(name);
+      message = this.sampleService.getHello(name);
       await this.redisService.set(cacheKey, message, 3600);
     }
     const context: Context = { module: 'HelloController', method: 'getHello' };
@@ -47,12 +47,16 @@ export class HelloController {
   // Name + Age POST
   @Post()
   async sayHello(
-    @Body() createHelloDto: CreateHelloDto,
+    @Body() createSampleDto: CreateSampleDto,
   ): Promise<{ data: { message: string } }> {
-    const message = this.helloService.sayHello(createHelloDto);
+    const message = this.sampleService.sayHello(createSampleDto);
     const context: Context = { module: 'HelloController', method: 'sayHello' };
-    const cacheKey = `hello:${createHelloDto.name}`;
-    await this.redisService.set(cacheKey, JSON.stringify(createHelloDto), 3600);
+    const cacheKey = `hello:${createSampleDto.name}`;
+    await this.redisService.set(
+      cacheKey,
+      JSON.stringify(createSampleDto),
+      3600,
+    );
     this.Log.logger('Succed', context);
     return { data: { message } };
   }
@@ -61,13 +65,13 @@ export class HelloController {
   @Put(':name')
   async updateName(
     @Param('name') name: string,
-    @Body() updateHelloDto: UpdateHelloDto,
+    @Body() updateSampleDto: UpdateSampleDto,
   ): Promise<{
     data: { message: string };
   }> {
-    const message = this.helloService.updateName(name, updateHelloDto);
+    const message = this.sampleService.updateName(name, updateSampleDto);
     const cacheKey = `hello:${name}`;
-    const newValue = `Hello, ${updateHelloDto.new_name}!`;
+    const newValue = `Hello, ${updateSampleDto.new_name}!`;
     await this.redisService.update(cacheKey, newValue, 3600);
     return { data: { message } };
   }
@@ -76,11 +80,11 @@ export class HelloController {
   @Patch(':id')
   async updateNameById(
     @Param('id') id: number,
-    @Body() patchHelloDto: PatchHelloDto,
+    @Body() patchSampleDto: PatchSampleDto,
   ): Promise<{ data: { message: string; id: number } }> {
-    const { message, id: updatedId } = this.helloService.updateNameById(
+    const { message, id: updatedId } = this.sampleService.updateNameById(
       id,
-      patchHelloDto,
+      patchSampleDto,
     );
     return { data: { message, id: updatedId } };
   }
@@ -90,7 +94,7 @@ export class HelloController {
   async deleteDataByName(
     @Param('name') name: string,
   ): Promise<{ data: { message: string } }> {
-    const { message } = await this.helloService.deleteDataByKey(name);
+    const { message } = await this.sampleService.deleteDataByKey(name);
     return { data: { message } };
   }
 }

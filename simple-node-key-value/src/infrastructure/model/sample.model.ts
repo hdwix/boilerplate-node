@@ -1,5 +1,5 @@
-export class HelloModel {
-  constructor(hello: HelloModel | any) {
+export class SampleModel {
+  constructor(hello: SampleModel | any) {
     this.name = hello.name;
     this.age = hello.age;
     this.city = hello.city;
@@ -9,7 +9,7 @@ export class HelloModel {
   age: number;
   city: string;
 
-  save(): HelloModel {
+  save(): SampleModel {
     return this;
   }
 }

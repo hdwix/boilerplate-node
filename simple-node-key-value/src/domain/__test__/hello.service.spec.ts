@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CreateHelloDto } from 'src/app/dto/create-hello.dto';
 import { PatchHelloDto } from 'src/app/dto/patch-hello.dto';
 import { UpdateHelloDto } from 'src/app/dto/update-hello.dto';
-import { HelloService } from '../services/hello.service';
+import { HelloService } from '../services/sample.service';
 
 describe('HelloService', () => {
   let service: HelloService;

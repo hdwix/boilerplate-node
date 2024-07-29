@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HelloService } from '../../domain/services/hello.service';
-import { CreateHelloDto } from '../dto/create-hello.dto';
-import { UpdateHelloDto } from '../dto/update-hello.dto';
-import { PatchHelloDto } from '../dto/patch-hello.dto';
-import { HelloController } from '../controllers/hello.controller';
+import { HelloService } from '../../domain/services/sample.service';
+import { CreateHelloDto } from '../dto/create-sample.dto';
+import { UpdateHelloDto } from '../dto/update-sample.dto';
+import { PatchHelloDto } from '../dto/patch-sample.dto';
+import { HelloController } from '../controllers/sample.controller';
 
 describe('HelloController', () => {
   let controller: HelloController;
