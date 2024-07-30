@@ -8,6 +8,9 @@ import {
   Delete,
   Put,
   UseInterceptors,
+  Logger,
+  InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateHelloDto } from '../dto/create-hello.dto';
 import { PatchHelloDto } from '../dto/patch-hello.dto';
@@ -16,6 +19,8 @@ import { HelloService } from '../../domain/services/hello.service';
 import { LoggingInterceptor } from '../interceptors/logging.interceptor';
 import { Context, LoggerService } from '../../domain/services/logger.service';
 import { RedisService } from '../../infrastructure/redis/redis.service';
+import { log } from 'console';
+import { LoggerMiddleware } from '../middleware/logger.middleware';
 
 @Controller('hello')
 @UseInterceptors(new LoggingInterceptor())
@@ -28,20 +33,34 @@ export class HelloController {
 
   // Hello Name GET
   @Get(':name')
-  async getHello(@Param('name') name: string): Promise<{ data: string }> {
-    const cacheKey = `hello:${name}`;
-    let message = await this.redisService.get(cacheKey, {
-      module: 'HelloController',
-      method: 'getHello',
-    });
+  async getHello(@Param('name') name: string): Promise<{ value: any }> {
+    try {
+      const cacheKey = `hello:${name}`;
+      let message = await this.redisService.get(cacheKey, {
+        module: 'HelloController',
+        method: 'getHello',
+      });
 
-    if (!message) {
-      message = this.helloService.getHello(name);
-      await this.redisService.set(cacheKey, message, 3600);
+      if (!message) {
+        message = this.helloService.getHello(name);
+        await this.redisService.set(cacheKey, message, 3600);
+      }
+      const context: Context = {
+        module: 'HelloController',
+        method: 'getHello',
+      };
+      this.Log.logger('Succed', context);
+      return { value: message };
+    } catch (error) {
+      console.log(error);
+      console.log(error.response.statusCode);
+      console.log(error.status);
+      this.Log.error('Error get value from redis');
+      if (error.status === 404 || error.response?.statusCode === 404) {
+        throw new NotFoundException(`${error.message}`);
+      }
+      throw new InternalServerErrorException('Internal Server Error Exception');
     }
-    const context: Context = { module: 'HelloController', method: 'getHello' };
-    this.Log.logger('Succed', context);
-    return { data: message };
   }
 
   // Name + Age POST
