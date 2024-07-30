@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
 import { LoggerService } from 'src/domain/services/logger.service';
@@ -43,13 +47,17 @@ export class RedisService {
         this.Log.logger(`Retrieved value for key '${key}' from cache`, context);
       } else {
         this.Log.warn(`Key '${key}' not found in cache`, context);
+        throw new NotFoundException('value not found in redis');
       }
 
-      return value;
+      return JSON.parse(value);
     } catch (error) {
       this.Log.error(`Error getting value for key '${key}': ${error}`, context);
-      return null;
+      if (error.message === 'value not found in redis') {
+        throw new NotFoundException(`${error.message}`);
+      }
     }
+    throw new InternalServerErrorException('Error get value from Redis');
   }
 
   async del(key: string): Promise<number> {

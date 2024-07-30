@@ -6,13 +6,13 @@ import { LoggerService } from './logger.service';
 import { RedisService } from '../../infrastructure/redis/redis.service';
 
 @Injectable()
-export class HelloService {
-  private Log: LoggerService = new LoggerService(HelloService.name);
+export class SampleService {
+  private Log: LoggerService = new LoggerService(SampleService.name);
   constructor(private readonly redisService: RedisService) {}
 
   // 1 get Hello + Name
-  getHello(name: string): string {
-    return `Hello, ${name}!`;
+  getKey(key: string): string {
+    return `Value for, ${key}!`;
   }
 
   // Post Hello name + age
