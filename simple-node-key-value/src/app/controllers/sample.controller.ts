@@ -8,6 +8,8 @@ import {
   Delete,
   Put,
   UseInterceptors,
+  InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateSampleDto } from '../dto/create-sample.dto';
 import { PatchSampleDto } from '../dto/patch-sample.dto';
@@ -29,22 +31,32 @@ export class SampleController {
     private readonly redisService: RedisService,
   ) {}
 
-  // Hello Name GET
-  @Get(':name')
-  async getHello(@Param('name') name: string): Promise<{ data: string }> {
-    const cacheKey = `hello:${name}`;
-    let message = await this.redisService.get(cacheKey, {
-      module: 'HelloController',
-      method: 'getHello',
-    });
+  @Get(':key')
+  async getKey(@Param('key') key: string): Promise<{ data: any }> {
+    try {
+      const cacheKey = `keyvalue:${key}`;
+      let message = await this.redisService.get(cacheKey, {
+        module: 'SampleController',
+        method: 'getKey',
+      });
 
-    if (!message) {
-      message = this.sampleService.getHello(name);
-      await this.redisService.set(cacheKey, message, 3600);
+      if (!message) {
+        message = this.sampleService.getKey(key);
+        await this.redisService.set(cacheKey, message, 3600);
+      }
+      const context: Context = {
+        module: 'SampleController',
+        method: 'getKey',
+      };
+      this.Log.logger('Suceed', context);
+      return { data: message };
+    } catch (error) {
+      this.Log.error('Error get value from redis');
+      if (error.status === 404 || error.response?.statusCode === 404) {
+        throw new NotFoundException(`${error.message}`);
+      }
+      throw new InternalServerErrorException('Internal Server Error Exception');
     }
-    const context: Context = { module: 'HelloController', method: 'getHello' };
-    this.Log.logger('Succed', context);
-    return { data: message };
   }
 
   // Name + Age POST
@@ -54,7 +66,7 @@ export class SampleController {
   ): Promise<{ data: { message: string } }> {
     const message = this.sampleService.sayHello(createSampleDto);
     const context: Context = { module: 'HelloController', method: 'sayHello' };
-    const cacheKey = `hello:${createSampleDto.name}`;
+    const cacheKey = `keyvalue:${createSampleDto.key}`;
     await this.redisService.set(
       cacheKey,
       JSON.stringify(createSampleDto),
@@ -97,7 +109,14 @@ export class SampleController {
   async deleteDataByKey(
     @Param('key') key: string,
   ): Promise<{ data: { message: string } }> {
-    const { message } = await this.sampleService.deleteDataByKey(key);
-    return { data: { message } };
+    try {
+      const { message } = await this.sampleService.deleteDataByKey(key);
+      return { data: { message } };
+    } catch (error) {
+      if (error.status === 404 || error.response?.statusCode === 404) {
+        throw new NotFoundException(`${error.message}`);
+      }
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
 }

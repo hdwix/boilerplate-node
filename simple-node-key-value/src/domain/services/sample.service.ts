@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSampleDto } from '../../app/dto/create-sample.dto';
 import { PatchSampleDto } from '../../app/dto/patch-sample.dto';
 import { UpdateSampleDto } from '../../app/dto/update-sample.dto';
@@ -11,8 +11,8 @@ export class SampleService {
   constructor(private readonly redisService: RedisService) {}
 
   // 1 get Hello + Name
-  getHello(name: string): string {
-    return `Hello, ${name}!`;
+  getKey(key: string): string {
+    return `Value for, ${key}!`;
   }
 
   // Post Hello name + age
@@ -41,11 +41,11 @@ export class SampleService {
     try {
       const result = await this.redisService.del(`keyvalue:${key}`);
       if (result === 0) {
-        return { message: 'Data not found' };
+        throw new NotFoundException('Data not found');
       }
-      return { message: 'Your data is deleted' };
+      return { message: 'Delete key value success' };
     } catch (error) {
-      return { message: 'Error deleting data' };
+      throw error;
     }
   }
 }
