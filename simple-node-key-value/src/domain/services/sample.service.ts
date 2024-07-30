@@ -17,7 +17,7 @@ export class SampleService {
 
   // Post Hello name + age
   sayHello(createSampleDto: CreateSampleDto): string {
-    return `Hello, ${createSampleDto.name} you are ${createSampleDto.age} years old`;
+    return `Hello, ${createSampleDto.key} you are ${createSampleDto.value} years old`;
   }
 
   // Update current name => new name
@@ -37,9 +37,9 @@ export class SampleService {
   }
 
   // DELETE
-  async deleteDataByKey(name: string): Promise<{ message: string }> {
+  async deleteDataByKey(key: string): Promise<{ message: string }> {
     try {
-      const result = await this.redisService.del(`hello:${name}`);
+      const result = await this.redisService.del(`keyvalue:${key}`);
       if (result === 0) {
         return { message: 'Data not found' };
       }

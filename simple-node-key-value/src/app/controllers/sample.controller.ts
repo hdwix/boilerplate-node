@@ -17,7 +17,10 @@ import { LoggingInterceptor } from '../interceptors/logging.interceptor';
 import { Context, LoggerService } from '../../domain/services/logger.service';
 import { RedisService } from '../../infrastructure/redis/redis.service';
 
-@Controller('samples')
+@Controller({
+  version: '1',
+  path: 'samples',
+})
 @UseInterceptors(new LoggingInterceptor())
 export class SampleController {
   private Log: LoggerService = new LoggerService('createOperation');
@@ -89,12 +92,12 @@ export class SampleController {
     return { data: { message, id: updatedId } };
   }
 
-  // DELETE by name
-  @Delete('/delete/:name')
-  async deleteDataByName(
-    @Param('name') name: string,
+  // DELETE by key
+  @Delete('/:key')
+  async deleteDataByKey(
+    @Param('key') key: string,
   ): Promise<{ data: { message: string } }> {
-    const { message } = await this.sampleService.deleteDataByKey(name);
+    const { message } = await this.sampleService.deleteDataByKey(key);
     return { data: { message } };
   }
 }
