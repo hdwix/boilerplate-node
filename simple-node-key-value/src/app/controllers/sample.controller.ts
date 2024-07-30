@@ -34,7 +34,7 @@ export class SampleController {
   @Get(':key')
   async getKey(@Param('key') key: string): Promise<{ value: any }> {
     try {
-      const cacheKey = `sample:${key}`;
+      const cacheKey = `keyvalue:${key}`;
       let message = await this.redisService.get(cacheKey, {
         module: 'SampleController',
         method: 'getKey',
@@ -51,9 +51,6 @@ export class SampleController {
       this.Log.logger('Suceed', context);
       return { value: message };
     } catch (error) {
-      console.log(error);
-      console.log(error.response.statusCode);
-      console.log(error.status);
       this.Log.error('Error get value from redis');
       if (error.status === 404 || error.response?.statusCode === 404) {
         throw new NotFoundException(`${error.message}`);
@@ -69,7 +66,7 @@ export class SampleController {
   ): Promise<{ data: { message: string } }> {
     const message = this.sampleService.sayHello(createHelloDto);
     const context: Context = { module: 'HelloController', method: 'sayHello' };
-    const cacheKey = `sample:${createHelloDto.name}`;
+    const cacheKey = `keyvalue:${createHelloDto.name}`;
     await this.redisService.set(cacheKey, JSON.stringify(createHelloDto), 3600);
     this.Log.logger('Succed', context);
     return { data: { message } };
