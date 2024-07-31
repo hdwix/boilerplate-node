@@ -8,21 +8,22 @@ import {
   Delete,
   Put,
   UseInterceptors,
-  Logger,
   InternalServerErrorException,
   NotFoundException,
+  Version,
 } from '@nestjs/common';
 import { CreateHelloDto } from '../dto/create-hello.dto';
 import { PatchHelloDto } from '../dto/patch-hello.dto';
 import { UpdateHelloDto } from '../dto/update-hello.dto';
-import { SampleService } from '../../domain/services/hello.service';
+import { SampleService } from '../../domain/services/sample.service';
 import { LoggingInterceptor } from '../interceptors/logging.interceptor';
 import { Context, LoggerService } from '../../domain/services/logger.service';
 import { RedisService } from '../../infrastructure/redis/redis.service';
-import { log } from 'console';
-import { LoggerMiddleware } from '../middleware/logger.middleware';
 
-@Controller('samples')
+@Controller({
+  path: 'samples',
+  version: '1',
+})
 @UseInterceptors(new LoggingInterceptor())
 export class SampleController {
   private Log: LoggerService = new LoggerService('createOperation');
@@ -33,25 +34,16 @@ export class SampleController {
 
   @Get(':key')
   async getKey(@Param('key') key: string): Promise<{ value: any }> {
+    const context: Context = {
+      module: 'SampleController',
+      method: 'getKey',
+    };
     try {
-      const cacheKey = `keyvalue:${key}`;
-      let message = await this.redisService.get(cacheKey, {
-        module: 'SampleController',
-        method: 'getKey',
-      });
-
-      if (!message) {
-        message = this.sampleService.getKey(key);
-        await this.redisService.set(cacheKey, message, 3600);
-      }
-      const context: Context = {
-        module: 'SampleController',
-        method: 'getKey',
-      };
+      const message = await this.sampleService.getKey(key);
       this.Log.logger('Suceed', context);
       return { value: message };
     } catch (error) {
-      this.Log.error('Error get value from redis');
+      this.Log.error(`Error get value for key : ${key}`);
       if (error.status === 404 || error.response?.statusCode === 404) {
         throw new NotFoundException(`${error.message}`);
       }

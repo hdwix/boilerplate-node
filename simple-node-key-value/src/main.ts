@@ -1,11 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { APP_NAME, APP_PORT } from './constants';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { SampleModule } from './sample.module';
 import { ResponseInterceptor } from './app/interceptors/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(SampleModule);
+  app.enableVersioning({
+    type: VersioningType.URI,
+  });
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(APP_PORT);

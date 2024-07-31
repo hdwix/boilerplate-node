@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HelloService } from '../../domain/services/hello.service';
+import { HelloService } from '../../domain/services/sample.service';
 import { CreateHelloDto } from '../dto/create-hello.dto';
 import { UpdateHelloDto } from '../dto/update-hello.dto';
 import { PatchHelloDto } from '../dto/patch-hello.dto';

@@ -1,5 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { SampleService } from './domain/services/hello.service';
+import { SampleService } from './domain/services/sample.service';
 import { LoggerMiddleware } from './app/middleware/logger.middleware';
 import { HelloRepository } from './infrastructure/repository/hello.repository';
 import { modelProviders } from './infrastructure/model';
