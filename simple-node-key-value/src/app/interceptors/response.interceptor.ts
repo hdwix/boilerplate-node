@@ -16,15 +16,15 @@ export class ResponseInterceptor implements NestInterceptor {
         // Format success response
         const response = context.switchToHttp().getResponse();
         const statusCode = response.statusCode || HttpStatus.OK;
-        const message = 'Success';
+        const { message, ...rest } = data.data;
 
         if (data.data) {
           return {
             meta: {
               code: statusCode,
-              message: message,
+              message: message || 'Success',
             },
-            data: data.data,
+            data: rest,
           };
         }
 

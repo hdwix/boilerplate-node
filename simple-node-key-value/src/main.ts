@@ -11,6 +11,9 @@ async function bootstrap() {
   });
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.useGlobalPipes(new ValidationPipe());
+  app.enableVersioning({
+    type: VersioningType.URI,
+  });
   await app.listen(APP_PORT);
 
   console.log(`Running service of ${APP_NAME} on port: ${APP_PORT}`);
