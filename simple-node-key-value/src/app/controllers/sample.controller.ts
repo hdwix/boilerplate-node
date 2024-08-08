@@ -8,21 +8,21 @@ import {
   Delete,
   Put,
   UseInterceptors,
-  Logger,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateHelloDto } from '../dto/create-hello.dto';
-import { PatchHelloDto } from '../dto/patch-hello.dto';
-import { UpdateHelloDto } from '../dto/update-hello.dto';
-import { SampleService } from '../../domain/services/hello.service';
+import { CreateSampleDto } from '../dto/create-sample.dto';
+import { PatchSampleDto } from '../dto/patch-sample.dto';
+import { UpdateSampleDto } from '../dto/update-sample.dto';
+import { SampleService } from '../../domain/services/sample.service';
 import { LoggingInterceptor } from '../interceptors/logging.interceptor';
 import { Context, LoggerService } from '../../domain/services/logger.service';
 import { RedisService } from '../../infrastructure/redis/redis.service';
-import { log } from 'console';
-import { LoggerMiddleware } from '../middleware/logger.middleware';
 
-@Controller('samples')
+@Controller({
+  version: '1',
+  path: 'samples',
+})
 @UseInterceptors(new LoggingInterceptor())
 export class SampleController {
   private Log: LoggerService = new LoggerService('createOperation');
@@ -32,7 +32,7 @@ export class SampleController {
   ) {}
 
   @Get(':key')
-  async getKey(@Param('key') key: string): Promise<{ value: any }> {
+  async getKey(@Param('key') key: string): Promise<{ data: any }> {
     try {
       const cacheKey = `keyvalue:${key}`;
       let message = await this.redisService.get(cacheKey, {
@@ -49,7 +49,7 @@ export class SampleController {
         method: 'getKey',
       };
       this.Log.logger('Suceed', context);
-      return { value: message };
+      return { data: message };
     } catch (error) {
       this.Log.error('Error get value from redis');
       if (error.status === 404 || error.response?.statusCode === 404) {
@@ -62,12 +62,16 @@ export class SampleController {
   // Name + Age POST
   @Post()
   async sayHello(
-    @Body() createHelloDto: CreateHelloDto,
+    @Body() createSampleDto: CreateSampleDto,
   ): Promise<{ data: { message: string } }> {
-    const message = this.sampleService.sayHello(createHelloDto);
+    const message = this.sampleService.sayHello(createSampleDto);
     const context: Context = { module: 'HelloController', method: 'sayHello' };
-    const cacheKey = `keyvalue:${createHelloDto.name}`;
-    await this.redisService.set(cacheKey, JSON.stringify(createHelloDto), 3600);
+    const cacheKey = `keyvalue:${createSampleDto.key}`;
+    await this.redisService.set(
+      cacheKey,
+      JSON.stringify(createSampleDto),
+      3600,
+    );
     this.Log.logger('Succed', context);
     return { data: { message } };
   }
@@ -76,13 +80,13 @@ export class SampleController {
   @Put(':name')
   async updateName(
     @Param('name') name: string,
-    @Body() updateHelloDto: UpdateHelloDto,
+    @Body() updateSampleDto: UpdateSampleDto,
   ): Promise<{
     data: { message: string };
   }> {
-    const message = this.sampleService.updateName(name, updateHelloDto);
+    const message = this.sampleService.updateName(name, updateSampleDto);
     const cacheKey = `hello:${name}`;
-    const newValue = `Hello, ${updateHelloDto.new_name}!`;
+    const newValue = `Hello, ${updateSampleDto.new_name}!`;
     await this.redisService.update(cacheKey, newValue, 3600);
     return { data: { message } };
   }
@@ -91,21 +95,28 @@ export class SampleController {
   @Patch(':id')
   async updateNameById(
     @Param('id') id: number,
-    @Body() patchHelloDto: PatchHelloDto,
+    @Body() patchSampleDto: PatchSampleDto,
   ): Promise<{ data: { message: string; id: number } }> {
     const { message, id: updatedId } = this.sampleService.updateNameById(
       id,
-      patchHelloDto,
+      patchSampleDto,
     );
     return { data: { message, id: updatedId } };
   }
 
-  // DELETE by name
-  @Delete('/delete/:name')
-  async deleteDataByName(
-    @Param('name') name: string,
+  // DELETE by key
+  @Delete('/:key')
+  async deleteDataByKey(
+    @Param('key') key: string,
   ): Promise<{ data: { message: string } }> {
-    const { message } = await this.sampleService.deleteDataByKey(name);
-    return { data: { message } };
+    try {
+      const { message } = await this.sampleService.deleteDataByKey(key);
+      return { data: { message } };
+    } catch (error) {
+      if (error.status === 404 || error.response?.statusCode === 404) {
+        throw new NotFoundException(`${error.message}`);
+      }
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
 }

@@ -1,12 +1,12 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class CreateHelloDto {
-  @IsNotEmpty()
+export class Sample {
   @IsString()
+  @IsNotEmpty()
   name: string;
 
+  @IsNumber()
   @IsNotEmpty()
-  @IsString()
   age: number;
 
   @IsString()
