@@ -17,12 +17,27 @@ export class SampleService {
 
   // Post Hello name + age
   sayHello(createSampleDto: CreateSampleDto): string {
-    return `Hello, ${createSampleDto.key} you are ${createSampleDto.value} years old`;
+    return `${createSampleDto.key} you are ${createSampleDto.value} years old`;
   }
 
   // Update current name => new name
   updateName(current_name: string, updateSampleDto: UpdateSampleDto): string {
     return `Your name is replaced from ${current_name} to ${updateSampleDto.new_name}`;
+  }
+
+  async setKeyValue(createSampleDto: CreateSampleDto): Promise<{ message: string }> {
+    try {
+      const cacheKey = `keyvalue:${createSampleDto.key}`;
+      await this.redisService.set(
+        cacheKey,
+        JSON.stringify(createSampleDto),
+        3600,
+      );
+      return {message:`success set value for key ${createSampleDto.key}`};
+    } catch (error) {
+      throw error; 
+    }
+    
   }
 
   // PATCH
