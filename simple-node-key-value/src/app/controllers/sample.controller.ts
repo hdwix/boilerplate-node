@@ -54,17 +54,15 @@ export class SampleController {
   @Post()
   async sayHello(
     @Body() createSampleDto: CreateSampleDto,
-  ): Promise<{ data: { message: string } }> {
-    const message = this.sampleService.sayHello(createSampleDto);
-    const context: Context = { module: 'HelloController', method: 'sayHello' };
-    const cacheKey = `keyvalue:${createSampleDto.key}`;
-    await this.redisService.set(
-      cacheKey,
-      JSON.stringify(createSampleDto),
-      3600,
-    );
-    this.Log.logger('Succed', context);
-    return { data: { message } };
+  ): Promise<{ data: any }> {
+    try {
+      const context: Context = { module: 'HelloController', method: 'sayHello' };
+      const message = this.sampleService.setKeyValue(createSampleDto);
+      return {data:message}
+    } catch (error) {
+      this.Log.error('Error set value from redis');
+      throw new InternalServerErrorException('Internal Server Error Exception');
+    }
   }
 
   //
