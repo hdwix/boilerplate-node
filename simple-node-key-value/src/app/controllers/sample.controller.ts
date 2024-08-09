@@ -68,18 +68,17 @@ export class SampleController {
   }
 
   //
-  @Put(':name')
-  async updateName(
-    @Param('name') name: string,
-    @Body() updateSampleDto: UpdateSampleDto,
-  ): Promise<{
-    data: { message: string };
-  }> {
-    const message = this.sampleService.updateName(name, updateSampleDto);
-    const cacheKey = `hello:${name}`;
-    const newValue = `Hello, ${updateSampleDto.new_name}!`;
-    await this.redisService.update(cacheKey, newValue, 3600);
-    return { data: { message } };
+  @Put(':key')
+  async updateValue(@Param('key') key: string, @Body() value: UpdateSampleDto) {
+    try {
+      const { message } = await this.sampleService.updateValue(key, value);
+      return { data: { message } };
+    } catch (error) {
+      if (error.status === 404 || error.response?.statusCode === 404) {
+        throw new NotFoundException(`${error.message}`);
+      }
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
 
   // PATCH

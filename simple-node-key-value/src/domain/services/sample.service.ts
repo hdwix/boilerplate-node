@@ -47,9 +47,30 @@ export class SampleService {
     return `Hello, ${createSampleDto.key} you are ${createSampleDto.value} years old`;
   }
 
-  // Update current name => new name
-  updateName(current_name: string, updateSampleDto: UpdateSampleDto): string {
-    return `Your name is replaced from ${current_name} to ${updateSampleDto.new_name}`;
+  // Update new value
+  async updateValue(
+    key: string,
+    value: UpdateSampleDto,
+  ): Promise<{ message: string }> {
+    try {
+      const cacheKey = `keyvalue:${key}`;
+      console.log('ini key', cacheKey);
+      const current = await this.redisService.get(cacheKey);
+      if (current == null) {
+        console.log('ini current', current);
+        throw new NotFoundException('key not found in redis');
+      }
+      const new_value = value.value;
+      await this.redisService.update(cacheKey, JSON.stringify(new_value), 3600);
+      const context: Context = {
+        module: 'SampleService',
+        method: 'updateValue',
+      };
+      this.Log.logger('Suceed', context);
+      return { message: 'Update key value success' };
+    } catch (error) {
+      throw error;
+    }
   }
 
   // PATCH
