@@ -6,6 +6,9 @@ import { ResponseInterceptor } from './app/interceptors/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(SampleModule);
+  app.enableVersioning({
+    type: VersioningType.URI,
+  });
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.useGlobalPipes(new ValidationPipe());
   app.enableVersioning({

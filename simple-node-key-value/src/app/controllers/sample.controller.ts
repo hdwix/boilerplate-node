@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   InternalServerErrorException,
   NotFoundException,
+  Version,
 } from '@nestjs/common';
 import { CreateSampleDto } from '../dto/create-sample.dto';
 import { PatchSampleDto } from '../dto/patch-sample.dto';
@@ -18,10 +19,9 @@ import { SampleService } from '../../domain/services/sample.service';
 import { LoggingInterceptor } from '../interceptors/logging.interceptor';
 import { Context, LoggerService } from '../../domain/services/logger.service';
 import { RedisService } from '../../infrastructure/redis/redis.service';
-
 @Controller({
-  version: '1',
   path: 'samples',
+  version: '1',
 })
 @UseInterceptors(new LoggingInterceptor())
 export class SampleController {
@@ -32,26 +32,17 @@ export class SampleController {
   ) {}
 
   @Get(':key')
-  async getKey(@Param('key') key: string): Promise<{ data: any }> {
+  async getKey(@Param('key') key: string): Promise<any> {
+    const context: Context = {
+      module: 'SampleController',
+      method: 'getKey',
+    };
     try {
-      const cacheKey = `keyvalue:${key}`;
-      let message = await this.redisService.get(cacheKey, {
-        module: 'SampleController',
-        method: 'getKey',
-      });
-
-      if (!message) {
-        message = this.sampleService.getKey(key);
-        await this.redisService.set(cacheKey, message, 3600);
-      }
-      const context: Context = {
-        module: 'SampleController',
-        method: 'getKey',
-      };
+      const message = await this.sampleService.getKey(key);
       this.Log.logger('Suceed', context);
-      return { data: message };
+      return { data: { value: message } };
     } catch (error) {
-      this.Log.error('Error get value from redis');
+      this.Log.error(`Error get value for key : ${key}`);
       if (error.status === 404 || error.response?.statusCode === 404) {
         throw new NotFoundException(`${error.message}`);
       }

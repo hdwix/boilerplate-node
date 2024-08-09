@@ -5,11 +5,11 @@ import {
 } from '@nestjs/common';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Redis } from 'ioredis';
-import { LoggerService } from 'src/domain/services/logger.service';
+import { Context, LoggerService } from 'src/domain/services/logger.service';
 
 @Injectable()
 export class RedisService {
-  private Log: LoggerService = new LoggerService(RedisService.name);
+  private log: LoggerService = new LoggerService(RedisService.name);
 
   constructor(@InjectRedis() private readonly redis: Redis) {}
 
@@ -22,13 +22,13 @@ export class RedisService {
       const result = ttlSeconds
         ? await this.redis.set(key, value, 'EX', ttlSeconds)
         : await this.redis.set(key, value);
-      this.Log.logger(
+      this.log.logger(
         `Set key '${key}' to '${value}'${ttlSeconds ? ` (TTL: ${ttlSeconds}s)` : ''}`,
         { module: 'RedisService', method: 'set' },
       );
       return result;
     } catch (error) {
-      this.Log.error(`Error setting key '${key}': ${error}`, {
+      this.log.error(`Error setting key '${key}': ${error}`, {
         module: 'RedisService',
         method: 'set',
       });
@@ -36,40 +36,30 @@ export class RedisService {
     }
   }
 
-  async get(
-    key: string,
-    context?: { module: string; method: string },
-  ): Promise<string | null> {
+  async get(key: string): Promise<string | null> {
+    const context: Context = {
+      module: 'RedisService',
+      method: 'get',
+    };
     try {
       const value = await this.redis.get(key);
-
-      if (value) {
-        this.Log.logger(`Retrieved value for key '${key}' from cache`, context);
-      } else {
-        this.Log.warn(`Key '${key}' not found in cache`, context);
-        throw new NotFoundException('value not found in redis');
-      }
-
-      return JSON.parse(value);
+      return value;
     } catch (error) {
-      this.Log.error(`Error getting value for key '${key}': ${error}`, context);
-      if (error.message === 'value not found in redis') {
-        throw new NotFoundException(`${error.message}`);
-      }
+      this.log.error(`Error get value from redis : ${error.message}`, context);
+      throw new InternalServerErrorException('Error get value from Redis');
     }
-    throw new InternalServerErrorException('Error get value from Redis');
   }
 
   async del(key: string): Promise<number> {
     try {
       const result = await this.redis.del(key);
-      this.Log.logger(`Deleted key '${key}'`, {
+      this.log.logger(`Deleted key '${key}'`, {
         module: 'RedisService',
         method: 'del',
       });
       return result;
     } catch (error) {
-      this.Log.error(`Error deleting key '${key}': ${error}`, {
+      this.log.error(`Error deleting key '${key}': ${error}`, {
         module: 'RedisService',
         method: 'del',
       });
@@ -86,13 +76,13 @@ export class RedisService {
       const result = ttlSeconds
         ? await this.redis.set(key, value, 'EX', ttlSeconds)
         : await this.redis.set(key, value);
-      this.Log.logger(
+      this.log.logger(
         `Updated key '${key}' to '${value}'${ttlSeconds ? ` (TTL: ${ttlSeconds}s)` : ''}`,
         { module: 'RedisService', method: 'update' },
       );
       return result;
     } catch (error) {
-      this.Log.error(`Error setting key '${key}': ${error}`, {
+      this.log.error(`Error setting key '${key}': ${error}`, {
         module: 'RedisService',
         method: 'update',
       });
