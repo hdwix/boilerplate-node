@@ -32,7 +32,7 @@ export class SampleController {
   ) {}
 
   @Get(':key')
-  async getKey(@Param('key') key: string): Promise<{ data: any }> {
+  async getKey(@Param('key') key: string): Promise<any> {
     const context: Context = {
       module: 'SampleController',
       method: 'getKey',
@@ -40,7 +40,7 @@ export class SampleController {
     try {
       const message = await this.sampleService.getKey(key);
       this.Log.logger('Suceed', context);
-      return { data: message };
+      return { data: { value: message } };
     } catch (error) {
       this.Log.error(`Error get value for key : ${key}`);
       if (error.status === 404 || error.response?.statusCode === 404) {

@@ -15,7 +15,7 @@ export class SampleService {
   constructor(private readonly redisService: RedisService) {}
 
   // 1 get keyvalue + key
-  async getKey(key: string): Promise<{ value: string }> {
+  async getKey(key: string): Promise<any> {
     const context: Context = {
       module: 'SampleService',
       method: 'getKey',
@@ -26,7 +26,7 @@ export class SampleService {
 
       if (message) {
         this.Log.logger(`Retrieved value for key '${key}' from cache`, context);
-        return JSON.parse(message);
+        return message;
       } else {
         this.Log.warn(`Key '${key}' not found in cache`, context);
         throw new NotFoundException('value not found in redis');
