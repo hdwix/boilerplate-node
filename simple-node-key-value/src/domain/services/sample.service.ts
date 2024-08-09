@@ -54,10 +54,8 @@ export class SampleService {
   ): Promise<{ message: string }> {
     try {
       const cacheKey = `keyvalue:${key}`;
-      console.log('ini key', cacheKey);
       const current = await this.redisService.get(cacheKey);
       if (current == null) {
-        console.log('ini current', current);
         throw new NotFoundException('key not found in redis');
       }
       const new_value = value.value;
